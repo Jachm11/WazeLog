@@ -7,7 +7,6 @@ arco("San Pedro","Curridabat",2,10,20).
 arco("San Pedro","Tres rios",3,15,30).
 arco("Tres rios","San Pedro",3,15,30).
 
-
 arco("Tres rios","Taras",10,50,100).
 arco("Taras","Tres rios",10,50,100).
 
@@ -64,13 +63,69 @@ min([],Minimo,Minimo). %si ya no hay mas rutas que revisar
 min([[Camino,Largo,Tiempo,TiempoPresa]|Resto],[_,Minimo,_,_],MinLista) :- Largo < Minimo, !, min(Resto,[Camino,Largo,Tiempo,TiempoPresa],MinLista). % ! significa encontro a uno menor, asi q no vale la pena seguir con ese largo
 min([_|Resto],Minimo,MinLista) :- min(Resto,Minimo,MinLista). %Llamada recursiva para el resto de las rutas en caso de que no se cumpla resto = [] o Largo < Minimo
 
+
 miRuta([A,B],Ruta,Largo,Tiempo,TiempoPresa):-
-    shortest(A,B,Ruta,Largo,Tiempo,TiempoPresa),!.
+    shortest(A,B,Ruta,Largo,Tiempo,TiempoPresa),!. % ruta mas corta y corte.
 
 miRuta([A,B|Resto],Ruta,Largo,Tiempo,TiempoPresa):-
-    shortest(A,B,Camino,Distancia,Duracion,DuracionPresa),
-    miRuta([B|Resto],[_|RutaAux],LargoAux,TiempoAux,TiempoPresaAux),
-    concatenar(Camino,RutaAux,Ruta),
-    Largo is Distancia + LargoAux,
-    Tiempo is Duracion + TiempoAux, 
-    TiempoPresa is DuracionPresa + TiempoPresaAux.
+    shortest(A,B,Camino,Distancia,Duracion,DuracionPresa), %Ruta mas corta de los primeros elementos de la lista
+    miRuta([B|Resto],[_|RutaAux],LargoAux,TiempoAux,TiempoPresaAux), % llamada recursiva para el resto de la lista de destinos
+    concatenar(Camino,RutaAux,Ruta), % Definicion de ruta
+    Largo is Distancia + LargoAux, % Definicion de largo
+    Tiempo is Duracion + TiempoAux, % Definicion de tiempo
+    TiempoPresa is DuracionPresa + TiempoPresaAux. % Definicion de tiempoPresa
+
+%Destinos es una lista de lugares
+wazeLog([A,A]):-
+    write("Ya se encuentra en su destino. \n"),
+    !,fail.
+
+wazeLog(Destinos):-
+    write("Es hora pico?"),
+    read(X),
+    wazeLogOut(Destinos,X).
+
+%Imprime las rutas para cuando hay presa
+wazeLogOut(Destinos,Bool):-
+    afirmativo(Bool),
+    miRuta(Destinos,Ruta,Largo,_,TiempoPresa),
+    write("Su ruta es "),
+    printList(Ruta),
+    write(" la distancia por recorrer es "),write(Largo),write(" kilometros"),
+    write(" y el tiempo estimado es "), write(TiempoPresa),write(" minutos."),
+    write(" Que tenga un buen viaje!"),!.
+
+%Imprime las rutas para cuando no hay presa
+wazeLogOut(Destinos,Bool):-
+    negativo(Bool),
+    miRuta(Destinos,Ruta,Largo,Tiempo,_),
+    write("Su ruta es "),
+    printList(Ruta),
+    write(" la distancia por recorrer es "),write(Largo),write(" kilometros"),
+    write(" y el tiempo estimado es "), write(Tiempo),write(" minutos."),
+    write(" Que tenga un buen viaje!"),!.
+
+%Si no se comprende la respuesta a si es hora pico o no.
+wazeLogOut(Destinos,_):-
+    miRuta(Destinos,_,_,_,_),
+    write("No lo he entendido, por favor responda con si o no. \n"),
+    wazeLog(Destinos).
+
+wazeLogOut(_,_):-
+    write("Lo sentimos, no posible llegar al o los destinos solicitados").
+
+%Imprime una lista de strigs separada por comas y con un ; al final
+printList([Head]):-
+    write(Head),write(";").
+
+printList([Head|Tail]):-
+    write(Head),write(", "),
+    printList(Tail).
+
+
+afirmativo("si").
+afirmativo("Si").
+afirmativo(si).
+negativo("no").
+negativo("No").
+negativo(no).
