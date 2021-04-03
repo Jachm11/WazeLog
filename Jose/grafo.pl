@@ -1,32 +1,32 @@
-arco("Curridabat","Tres rios",3,15,30).
-arco("Tres rios","Curridabat",3,15,30).
+arco("curridabat","tresrios",3,15,30).
+arco("tresrios","curridabat",3,15,30).
 
-arco("Curridabat","San Pedro",2,10,20).
-arco("San Pedro","Curridabat",2,10,20).
+arco("curridabat","sanpedro",2,10,20).
+arco("sanpedro","curridabat",2,10,20).
 
-arco("San Pedro","Tres rios",3,15,30).
-arco("Tres rios","San Pedro",3,15,30).
+arco("sanpedro","tresrios",3,15,30).
+arco("tresrios","sanpedro",3,15,30).
 
-arco("Tres rios","Taras",10,50,100).
-arco("Taras","Tres rios",10,50,100).
+arco("tresrios","taras",10,50,100).
+arco("taras","tresrios",10,50,100).
 
-arco("Taras","Patarra",5,25,50).
-arco("Patarra","Taras",5,25,50).
+arco("taras","patarra",5,25,50).
+arco("patarra","taras",5,25,50).
 
-arco("Taras","Dota",100,25,50).
-arco("Dota","Taras",100,25,50).
+arco("taras","dota",100,25,50).
+arco("dota","taras",100,25,50).
 
-arco("Taras","Cartago",2,10,20).
-arco("Cartago","Taras",2,10,20).
+arco("taras","cartago",2,10,20).
+arco("cartago","taras",2,10,20).
 
-arco("Cartago","Dota",7,35,70).
-arco("Dota","Cartago",7,35,70).
+arco("cartago","dota",7,35,70).
+arco("dota","cartago",7,35,70).
 
-arco("Cartago","Narnia",20,35,70).
-arco("Narnia","Cartago",20,35,70).
+arco("cartago","narnia",20,35,70).
+arco("narnia","cartago",20,35,70).
 
-arco("Dota","Narnia",20,35,70).
-arco("Narnia","Dota",20,35,70).
+arco("dota","narnia",20,35,70).
+arco("narnia","dota",20,35,70).
 
 %La concatenacion de una lista vacia y un elemento es el elemento
 concatenar([],Elem,Elem).
