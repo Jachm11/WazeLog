@@ -76,47 +76,48 @@ miRuta([A,B|Resto],Ruta,Largo,Tiempo,TiempoPresa):-
     TiempoPresa is DuracionPresa + TiempoPresaAux. % Definicion de tiempoPresa
 
 %Destinos es una lista de lugares
-wazeLog([A,A]):-
+wazeLogIn([A,A]):-
     write("Ya se encuentra en su destino. \n"),
     !,fail.
 
-wazeLog(Destinos):-
-    write("Es hora pico?"),
-    read(X),
-    wazeLogOut(Destinos,X).
+wazeLogIn(Destinos):-
+    write("WazeLog: Es hora pico? \nUsuario: "),
+    read_line_to_string(user_input,Input),
+    string_lower(Input,NewInput),
+    wazeLogOut(Destinos,NewInput).
 
 %Imprime las rutas para cuando hay presa
 wazeLogOut(Destinos,Bool):-
     afirmativo(Bool),
     miRuta(Destinos,Ruta,Largo,_,TiempoPresa),
-    write("Su ruta es "),
+    write("WazeLog: Su ruta es "),
     printList(Ruta),
     write(" la distancia por recorrer es "),write(Largo),write(" kilometros"),
-    write(" y el tiempo estimado es "), write(TiempoPresa),write(" minutos."),
-    write(" Que tenga un buen viaje!"),!.
+    write(" y el tiempo estimado es "), write(TiempoPresa),write(" minutos. \n"),
+    write("Que tenga un buen viaje!"),!.
 
 %Imprime las rutas para cuando no hay presa
 wazeLogOut(Destinos,Bool):-
     negativo(Bool),
     miRuta(Destinos,Ruta,Largo,Tiempo,_),
-    write("Su ruta es "),
+    write("WazeLog: Su ruta es "),
     printList(Ruta),
-    write(" la distancia por recorrer es "),write(Largo),write(" kilometros"),
-    write(" y el tiempo estimado es "), write(Tiempo),write(" minutos."),
-    write(" Que tenga un buen viaje!"),!.
+    write("WazeLog: La distancia por recorrer es "),write(Largo),write(" kilometros;\n"),
+    write("WazeLog: Y el tiempo estimado es "), write(Tiempo),write(" minutos. \n"),
+    write("WazeLog Que tenga un buen viaje! Y gracias por usar WazeLog! "),!.
 
 %Si no se comprende la respuesta a si es hora pico o no.
 wazeLogOut(Destinos,_):-
     miRuta(Destinos,_,_,_,_),
-    write("No lo he entendido, por favor responda con si o no. \n"),
-    wazeLog(Destinos).
+    write("WazeLog: No lo he entendido, por favor responda con si o no. \n"),
+    wazeLogIn(Destinos).
 
 wazeLogOut(_,_):-
-    write("Lo sentimos, no posible llegar al o los destinos solicitados").
+    write("WazeLog: Lo sentimos, no posible llegar al o los destinos solicitados").
 
 %Imprime una lista de strigs separada por comas y con un ; al final
 printList([Head]):-
-    write(Head),write(";").
+    write(Head),write(";\n").
 
 printList([Head|Tail]):-
     write(Head),write(", "),
@@ -124,8 +125,4 @@ printList([Head|Tail]):-
 
 
 afirmativo("si").
-afirmativo("Si").
-afirmativo(si).
 negativo("no").
-negativo("No").
-negativo(no).

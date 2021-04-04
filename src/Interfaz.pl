@@ -64,6 +64,8 @@ verbo(["quiero"]).
 verbo(["gustaria"]).
 verbo(["tengo"]).
 verbo_lugar(["voy"]).
+verbo_lugar(["encuentro"]).
+verbo_lugar(["ubico"]).
 verbo_lugar(["ir"]).
 verbo_lugar(["estoy"]).
 verbo_lugar(["pasar"]).
@@ -72,39 +74,62 @@ verbo_lugar(["parar"]).
 lugares(Ele, [Ele|_]):- lugar([Ele]).
 lugares(Ele, [_|Lista]):-lugares(Ele, Lista).
 
-usrLog():-usrOracion(Camino),wazeLog(Camino).
-wazeSaludo:-write("Bienvenido").
-%pregunta:-  write("Donde está?: "),read(Input), lugares(Output,Input), write(Output).
-usrOracion(Camino):- usrOrigen(Origen),
-                     usrDestino(Destino),
-                     usrParadas(Paradas),           
-                     append([Origen,Paradas,Destino],Camino).
-                     %wazeLog(["Cartago", "Dota", "Taras"]).    
+usrLog():-usrOracion(Camino),!,wazeLogIn(Camino).
+wazeSaludo:-write("WazeLog: Bienvenido! WazeLog para servirle! \n").
 
-usrOrigen(Origen):- write("Donde está?: "),
+%pregunta:-  write("Donde está?: "),read(Input), lugares(Output,Input), write(Output).
+usrOracion(Camino):- write("WazeLog: Primero digame; \n"),
+                     usrOrigen(Origen),
+                     write("WazeLog: Muy bien, ahora; \n"),
+                     usrDestino(Destino),
+                     write("WazeLog: Excelente, finalmente; \n"),
+                     write("WazeLog: Tiene alguna parada intermedia? \nUsuario: "),
+                     usrParadas(Paradas),
+                     !,           
+                     append([Origen,Paradas,Destino],Camino).   
+
+usrOrigen(Origen):- write("WazeLog: En donde se encuentra? \nUsuario: "),
                     read_line_to_string(user_input,Input),
                     string_lower(Input,NewInput),
                     split_string(NewInput, "\s", "\s", Lista), 
-                    oracion(Lista,Origen).
-usrOrigen(Origen):- write("No entendi"),usrOrigen(Origen).
-usrDestino(Destino):- write("Donde va?: "),
+                    oracion(Lista,Origen),
+                    head(Origen,Org), 
+                    write("WazeLog: OK, esta en "),write(Org),write(".\n").
+                    
+usrOrigen(Origen):- write("WazeLog: Lo lamento pero no entendi. Por favor especifique una ubiacion valida. \n"),usrOrigen(Origen).
+
+usrDestino(Destino):- write("WazeLog: A donde se dirige? \nUsuario: "),
                       read_line_to_string(user_input,Input),
                       string_lower(Input,NewInput),
                       split_string(NewInput, "\s", "\s", Lista), 
-                      oracion(Lista,Destino).
+                      oracion(Lista,Destino),
+                      head(Destino,Dest), 
+                      write("WazeLog: Entendido! Va para "),write(Dest),write(".\n").
+                    
+usrDestino(Destino):- write("WazeLog: No entendi. Podria decirme, utilizando un lugar conocido; \n"),usrDestino(Destino).
 
-usrDestino(Destino):- write("No entendi"),usrDestino(Destino).
-usrParadas([Parada|Paradas]):- write("Alguna parada?: "),
-                               read_line_to_string(user_input,Input),
+usrParadas([Parada|Paradas]):- read_line_to_string(user_input,Input),
                                string_lower(Input,NewInput),
                                split_string(NewInput, "\s", "\s", Lista), 
-                               
-                               oracion(Lista,ParadaL),
-                               head(ParadaL,Parada),
-
-                               dif(NewInput,"no"),
-                                
-                               usrParadas(Paradas).
+                               paradas(NewInput,Lista,Parada,Paradas).
 usrParadas([]).
-usrParadas([Parada|Paradas]):- write("No entendi"),usrParadas([Parada|Paradas]).
+
+usrParadas([Parada|Paradas]):- write("WazeLog: No comprendi, lo siento. Por favor mencione una locacion valida. \n"),
+                               write("WazeLog: Tiene una parada adicional? \nUsuario: "),
+                               usrParadas([Parada|Paradas]).
+
+paradas(_,Lista,Parada,Paradas):- oracion(Lista,ParadaL),
+                                  head(ParadaL,Parada),
+                                  write("WazeLog: Anotado! Parada en "),write(Parada),write(".\n"),
+                                  write("WazeLog: Alguna otra parada adicional? \nUsuario: "),
+                                  usrParadas(Paradas).
+
+paradas(Input,_,_,_):- not(dif(Input,"no")),!,fail.
+
+paradas(Input,_,Parada,Paradas):- not(dif(Input,"si")),
+                   write("WazeLog: Muy bien, cual seria? \nUsuario: "),
+                   usrParadas([Parada|Paradas]).
+
 head([H|_], H).
+
+wazeLog():-wazeSaludo(),usrLog().
