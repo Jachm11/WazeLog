@@ -19,7 +19,12 @@ sintagma_nominal_lugar(SN,SN) :- lugar(SN). %Narnia
 sintagma_nominal_lugar(SN,L) :- preposicion(A),%a Narnia
                                 lugar(L),
                                 append(A,L,SN).
-
+sintagma_nominal_lugar(SNL,L) :- sintagma_nominal(SN),%a la farmacia
+                                lugar(L),   
+                                append(SN,L,SNL).
+sintagma_nominal(SN) :- preposicion(P),
+                        articulo(A),%a la
+                        append(P,A,SN).
 
 sintagma_verbal_lugar(SV,SV) :- verbo_lugar(SV).%ir
 sintagma_verbal_lugar(SV,L) :- verbo_lugar(V),%ir a Narnia /ir Narnia
@@ -48,7 +53,12 @@ preposicion(["en"]).
 nombre(["yo"]).
 nombre(["me"]).
 conector(["que"]).
-
+articulo(["el"]).
+articulo(["la"]).
+objeto(["supermercado"]).
+lugar(["supermercado"]).
+objeto(["farmacia"]).
+lugar(["farmacia"]).
 lugar(["tresrios"]).
 lugar(["aserri"]).
 lugar(["pasoancho"]).
@@ -79,6 +89,7 @@ wazeSaludo:-write("WazeLog: Bienvenido! WazeLog para servirle! \n").
 
 %pregunta:-  write("Donde está?: "),read(Input), lugares(Output,Input), write(Output).
 usrOracion(Camino):- write("WazeLog: Primero digame; \n"),
+                    
                      usrOrigen(Origen),
                      write("WazeLog: Muy bien, ahora; \n"),
                      usrDestino(Destino),
@@ -92,7 +103,8 @@ usrOrigen(Origen):- write("WazeLog: En donde se encuentra? \nUsuario: "),
                     read_line_to_string(user_input,Input),
                     string_lower(Input,NewInput),
                     split_string(NewInput, "\s", "\s", Lista), 
-                    oracion(Lista,Origen),
+                    oracion(Lista,OrigenIn),
+                    usrObjeto(OrigenIn,Origen),
                     head(Origen,Org), 
                     write("WazeLog: OK, esta en "),write(Org),write(".\n").
                     
@@ -102,7 +114,8 @@ usrDestino(Destino):- write("WazeLog: A donde se dirige? \nUsuario: "),
                       read_line_to_string(user_input,Input),
                       string_lower(Input,NewInput),
                       split_string(NewInput, "\s", "\s", Lista), 
-                      oracion(Lista,Destino),
+                      oracion(Lista,DestinoIn),
+                      usrObjeto(DestinoIn,Destino),
                       head(Destino,Dest), 
                       write("WazeLog: Entendido! Va para "),write(Dest),write(".\n").
                     
@@ -118,7 +131,8 @@ usrParadas([Parada|Paradas]):- write("WazeLog: No comprendi, lo siento. Por favo
                                write("WazeLog: Tiene una parada adicional? \nUsuario: "),
                                usrParadas([Parada|Paradas]).
 
-paradas(_,Lista,Parada,Paradas):- oracion(Lista,ParadaL),
+paradas(_,Lista,Parada,Paradas):- oracion(Lista,ParadaLIn),
+                                  usrObjeto(ParadaLIn,ParadaL),
                                   head(ParadaL,Parada),
                                   write("WazeLog: Anotado! Parada en "),write(Parada),write(".\n"),
                                   write("WazeLog: Alguna otra parada adicional? \nUsuario: "),
@@ -130,6 +144,23 @@ paradas(Input,_,Parada,Paradas):- not(dif(Input,"si")),
                    write("WazeLog: Muy bien, cual seria? \nUsuario: "),
                    usrParadas([Parada|Paradas]).
 
+usrObjeto(Lugar,X):-lugar(Lugar),not(objeto(Lugar)),X = Lugar.
+usrObjeto(Lugar,X):-lugar(Lugar),objeto(Lugar),
+                    write("WazeLog: Por favor especifique donde queda (el/la) "),head(Lugar,H), write(H), write("\nUsuario: "),
+                    read_line_to_string(user_input,Input),
+                    string_lower(Input,NewInput),
+                    split_string(NewInput, "\s", "\s", Lista), 
+                    oracion(Lista,L),
+                    usrObjeto(L,X).
+
+
+usrObjeto(Lugar,X):-write("WazeLog: No comprendi, lo siento. Por favor mencione una locacion valida. \n"),
+                    usrObjeto(Lugar,X).
+
+
+
+
+
 head([H|_], H).
 
-wazeLog():-wazeSaludo(),usrLog().
+wazeLog:-wazeSaludo(),usrLog().
