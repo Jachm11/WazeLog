@@ -107,18 +107,37 @@ articulo(["la"]).
 articulo(["un"]).
 articulo(["una"]).
 articulo(["al"]).
+articulo(["mi"]).
 
 %objeto(X), donde X es un objeto representado con una lista con un solo string. Los objetos son lugares no específicos
 objeto(["supermercado"]).
 objeto(["farmacia"]).
 objeto(["hospital"]).
 objeto(["tienda"]).
+objeto(["gimnacio"]).
+objeto(["ferreteria"]).
+objeto(["parque"]).
+objeto(["casa"]).
+objeto(["hogar"]).
+objeto(["banco"]).
+objeto(["mall"]).
+objeto(["cine"]).
+objeto(["restaurante"]).
 
 %lugar(X), donde X es un lugar representado con una lista con un solo string
 lugar(["farmacia"]).
 lugar(["tienda"]).
 lugar(["hospital"]).
 lugar(["supermercado"]).
+lugar(["gimnacio"]).
+lugar(["ferreteria"]).
+lugar(["parque"]).
+lugar(["casa"]).
+lugar(["hogar"]).
+lugar(["banco"]).
+lugar(["mall"]).
+lugar(["cine"]).
+lugar(["restaurante"]).
 
 lugar(["corralillo"]).
 lugar(["cartago"]).
@@ -129,8 +148,10 @@ lugar(["orosi"]).
 lugar(["cachi"]).
 lugar(["turrialba"]).
 
+%Define lugar como la union de dos lugares de nombre compuesto
 lugar(L):-list(L,H,T), lugar_compuesto(H),lugar_compuesto(T).
 
+%lugar_compuesto(X), donde X es una de las dos partes del nombre de un lugar representado con una lista con un solo string
 lugar_compuesto(["musgo"]).
 lugar_compuesto(["verde"]).
 
@@ -141,7 +162,7 @@ lugar_compuesto(["tres"]).
 lugar_compuesto(["rios"]).
 
 lugar_compuesto(["juan"]).
-lugar_compuesto(["viñas"]).
+lugar_compuesto(["vinas"]).
 
 
 %verbo(X), donde X es un verbo representado con una lista con un solo string

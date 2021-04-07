@@ -48,9 +48,9 @@ arco("cervantes","cachi",7,10,20).
 arco("cachi","turrialba",40,50,100).
 arco("turrialba","cachi",40,50,100).
 
-arco("cervantes","juan viñas",5,5,10).
+arco("cervantes","juan vinas",5,5,10).
 
-arco("juan viñas","turrialba",4,5,10).
+arco("juan vinas","turrialba",4,5,10).
 
 arco("turrialba","pacayas",18,20,40).
 
