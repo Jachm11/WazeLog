@@ -28,7 +28,7 @@ oracion(O,L) :- sintagma_verbal(SV),
                 sintagma_verbal_lugar(SVL,L),
                 append(SV,SVL,O).
 %Descripción: Con esta regla se puede formar una oración con un sintagma_nominal y un sintagma_verbal_lugar. Ej: El supermercado esta en Aserri
-oracion(O,L) :- sintagma_nominal(SN,Ob),
+oracion(O,L) :- sintagma_nominal(SN,_),
                 sintagma_verbal_lugar(SVL,L),
                 append(SN,SVL,O).
 %_____________________________________________________________________________________________________________________  
@@ -119,16 +119,30 @@ lugar(["farmacia"]).
 lugar(["tienda"]).
 lugar(["hospital"]).
 lugar(["supermercado"]).
-lugar(["tresrios"]).
-lugar(["aserri"]).
-lugar(["pasoancho"]).
+
+lugar(["corralillo"]).
 lugar(["cartago"]).
-lugar(["taras"]).
-lugar(["dota"]).
-lugar(["sanpedro"]).
-lugar(["curridabat"]).
-lugar(["patarra"]).
-lugar(["narnia"]).
+lugar(["pacayas"]).
+lugar(["paraiso"]).
+lugar(["cervantes"]).
+lugar(["orosi"]).
+lugar(["cachi"]).
+lugar(["turrialba"]).
+
+lugar(L):-list(L,H,T), lugar_compuesto(H),lugar_compuesto(T).
+
+lugar_compuesto(["musgo"]).
+lugar_compuesto(["verde"]).
+
+lugar_compuesto(["san"]).
+lugar_compuesto(["jose"]).
+
+lugar_compuesto(["tres"]).
+lugar_compuesto(["rios"]).
+
+lugar_compuesto(["juan"]).
+lugar_compuesto(["viñas"]).
+
 
 %verbo(X), donde X es un verbo representado con una lista con un solo string
 verbo(["quiero"]).
@@ -172,7 +186,7 @@ usrOracion(Camino):- write("WazeLog: Primero digame; \n"),
                      write("WazeLog: Tiene alguna parada intermedia? \nUsuario: "),
                      usrParadas(Paradas),
                      !,           
-                     append([Origen,Paradas,Destino],Camino).   
+                     append([[Origen],Paradas,[Destino]],Camino).   
 %_____________________________________________________________________________________________________________________ 
 %usrOrigen(X) donde X es el lugar de origen, en donde se encuentre el usuario 
 %Descripción: Si la respuesta es una oración válida, encuentra el lugar de origen indicado por el usuario  
@@ -181,9 +195,9 @@ usrOrigen(Origen):- write("WazeLog: En donde se encuentra? \nUsuario: "),
                     string_lower(Input,NewInput),
                     split_string(NewInput, "\s", "\s", Lista), 
                     oracion(Lista,OrigenIn),
-                    usrObjeto(OrigenIn,Origen),
-                    head(Origen,Org), 
-                    write("WazeLog: OK, esta en "),write(Org),write(".\n").
+                    usrObjeto(OrigenIn,OrigenOut),
+                    compound(OrigenOut,Origen), 
+                    write("WazeLog: OK, esta en "),write(Origen),write(".\n").
 %Descripción: Si la respuesta no es una oración válida le indica al usuario que no entendió y se vuelve a llamar recusivamente                    
 usrOrigen(Origen):- write("WazeLog: Lo lamento pero no entendi. Por favor especifique una ubiacion valida. \n"),usrOrigen(Origen).
 %_____________________________________________________________________________________________________________________  
@@ -194,9 +208,9 @@ usrDestino(Destino):- write("WazeLog: A donde se dirige? \nUsuario: "),
                       string_lower(Input,NewInput),
                       split_string(NewInput, "\s", "\s", Lista), 
                       oracion(Lista,DestinoIn),
-                      usrObjeto(DestinoIn,Destino),
-                      head(Destino,Dest), 
-                      write("WazeLog: Entendido! Va para "),write(Dest),write(".\n").
+                      usrObjeto(DestinoIn,DestinoOut),
+                      compound(DestinoOut,Destino), 
+                      write("WazeLog: Entendido! Va para "),write(Destino),write(".\n").
 %Descripción: Si la respuesta no es una oración válida le indica al usuario que no entendió y se vuelve a llamar recusivamente                     
 usrDestino(Destino):- write("WazeLog: No entendi. Podria decirme, utilizando un lugar conocido; \n"),usrDestino(Destino).
 %_____________________________________________________________________________________________________________________  
@@ -216,26 +230,26 @@ usrParadas([Parada|Paradas]):- write("WazeLog: No comprendi, lo siento. Por favo
 %                                    Parada es la nuva parada que indica el usuario y
 %                                    Paradas es una lista con todas las paradas
 
-%Descripción: Si la oración es válida, extrae el lugar y lo agrega a la lista de Paradas y vuelve a llamar a usrParadas  
-paradas(_,Lista,Parada,Paradas):- oracion(Lista,ParadaLIn),
-                                  usrObjeto(ParadaLIn,ParadaL),
-                                  head(ParadaL,Parada),
-                                  write("WazeLog: Anotado! Parada en "),write(Parada),write(".\n"),
-                                  write("WazeLog: Alguna otra parada adicional? \nUsuario: "),
-                                  usrParadas(Paradas).
 %Descripción: Si la respuesta del usuario es no, es decir no tiene más paradas, termina la recursión de paradas
 paradas(Input,_,_,_):- not(dif(Input,"no")),!,fail.
 %Descripción: Si la respuesta del usuario es si, es decir tiene más paradas, vuelve a llamar a usrParadas
 paradas(Input,_,Parada,Paradas):- not(dif(Input,"si")),
                    write("WazeLog: Muy bien, cual seria? \nUsuario: "),
                    usrParadas([Parada|Paradas]).
+%Descripción: Si la oración es válida, extrae el lugar y lo agrega a la lista de Paradas y vuelve a llamar a usrParadas  
+paradas(_,Lista,Parada,Paradas):- oracion(Lista,ParadaLIn),
+usrObjeto(ParadaLIn,ParadaL),
+compound(ParadaL,Parada),
+write("WazeLog: Anotado! Parada en "),write(Parada),write(".\n"),
+write("WazeLog: Alguna otra parada adicional? \nUsuario: "),
+usrParadas(Paradas).
 %_____________________________________________________________________________________________________________________  
 %usrObjeto(Lugar,X), donde X es es lugar indicado por el usuario, ya sea un objeto, y X es el lugar una vez que especifique
 %Descripción: Si el lugar indicado es especifico y no un objeto, le asigna el valor de Lugar a X
 usrObjeto(Lugar,X):-lugar(Lugar),not(objeto(Lugar)),X = Lugar.
 %Descripción: Si el lugar indicado por el usuario no es lo suficientemente especifico, se llama recursivamente hasta que indique un lugar que se encuentre en el mapa
 usrObjeto(Lugar,X):-lugar(Lugar),objeto(Lugar),
-                    write("WazeLog: Por favor especifique donde queda (el/la) "),head(Lugar,H), write(H), write("\nUsuario: "),
+                    write("WazeLog: Por favor especifique donde queda (el/la) "),compound(Lugar,String), write(String), write("\nUsuario: "),
                     read_line_to_string(user_input,Input),
                     string_lower(Input,NewInput),
                     split_string(NewInput, "\s", "\s", Lista), 
@@ -250,6 +264,12 @@ usrObjeto(Lugar,X):-write("WazeLog: No comprendi, lo siento. Por favor mencione 
 
 %head(L,X) donde L es una lista y X es la cabeza de esa lista
 head([H|_], H).
+%list(Lista) separa una lista de dos elementos en dos listas con H y T
+list([H,T],[H],[T]).
+%compound(List,String) toma un nombre compuesto por dos partes en una lista y lo transforma en un string separado por un espacio
+compound(List,String):-list(List,H,T),head(H,Primero),head(T,Segundo), string_concat(Primero," ",Space),string_concat(Space,Segundo,String),!.
+compound(List,String):-head(List,String).
+
 
 %                 ____________________________________________________________
 %________________/ Regla para iniciar WazeLog

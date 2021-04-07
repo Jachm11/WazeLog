@@ -1,38 +1,58 @@
 %                 __________________________________
 %________________/ Base de datos del grafo
 
-%arco(origen, destino, distancia, tiempo estimado, tiempo estimado en presa)
+% arco(origen, destino, distancia, tiempo estimado, tiempo estimado en presa)
 % Descripción: la relacion arco describe un arco o arista de un grafo. Es un grafo mixto. Cada arco es una relacion dirigida.
 
-arco("curridabat","tresrios",3,15,30).
-arco("tresrios","curridabat",3,15,30).
+arco("corralillo","san jose",22,25,50).
+arco("san jose","corralillo",22,25,50).
 
-arco("curridabat","sanpedro",2,10,20).
-arco("sanpedro","curridabat",2,10,20).
+arco("corralillo","musgo verde",6,10,20).
+arco("musgo verde","corralillo",6,10,20).
 
-arco("sanpedro","tresrios",3,15,30).
-arco("tresrios","sanpedro",3,15,30).
+arco("musgo verde","cartago",10,15,30).
+arco("cartago","musgo verde",10,15,30).
 
-arco("tresrios","taras",10,50,100).
-arco("taras","tresrios",10,50,100).
+arco("cartago","san jose",20,25,50).
+arco("san jose","cartago",20,25,50).
 
-arco("taras","patarra",5,25,50).
-arco("patarra","taras",5,25,50).
+arco("cartago","tres rios",8,10,20).
 
-arco("taras","dota",100,25,50).
-arco("dota","taras",100,25,50).
+arco("tres rios","san jose",8,10,20).
 
-arco("taras","cartago",2,10,20).
-arco("cartago","taras",2,10,20).
+arco("cartago","paraiso",10,10,20).
 
-arco("cartago","dota",7,35,70).
-arco("dota","cartago",7,35,70).
+arco("cartago","pacayas",13,15,30).
+arco("pacayas","cartago",13,15,30).
 
-arco("cartago","narnia",20,35,70).
-arco("narnia","cartago",20,35,70).
+arco("pacayas","tres rios",15,20,40).
+arco("tres rios","pacayas",15,20,40).
 
-arco("dota","narnia",20,35,70).
-arco("narnia","dota",20,35,70).
+arco("pacayas","cervantes",8,10,20).
+arco("cervantes","pacayas",8,10,20).
+
+arco("paraiso","cervantes",4,5,10).
+
+arco("paraiso","orosi",8,10,20).
+arco("orosi","paraiso",8,10,20).
+
+arco("paraiso","cachi",10,15,30).
+arco("cachi","paraiso",10,15,30).
+
+arco("cachi","orosi",12,15,30).
+arco("orosi","cachi",12,15,30).
+
+arco("cachi","cervantes",7,10,20).
+arco("cervantes","cachi",7,10,20).
+
+arco("cachi","turrialba",40,50,100).
+arco("turrialba","cachi",40,50,100).
+
+arco("cervantes","juan viñas",5,5,10).
+
+arco("juan viñas","turrialba",4,5,10).
+
+arco("turrialba","pacayas",18,20,40).
 
 
 %________________________________________________________ 
@@ -64,6 +84,7 @@ printList([Head|Tail]):-
 %                 _______________________________________
 %________________/ Reglas para determinacion de rutas
 
+% - - - - - - Codigo original tomado y adaptado de https://www.cpp.edu/~jrfisher/www/prolog_tutorial/2_15A.pl - - - - - - 
 
 % camino(Inicio,Final,Camino,Largo,Tiempo,TiempoPresa)
 % Descripción: regla principal de viajar. Encuentra todas las rutas posibles que hay desde un nodo A a un nodo B.
@@ -102,11 +123,13 @@ minimal([Frente|Resto],Minimo) :- min(Resto,Frente,Minimo).
 % Condicion de parada.
 % Descripción: Cuando ya no hay mas rutas completas por revisar.
 min([],Minimo,Minimo).
-% min(Resto,Frente,Minimo)
+% min(Resto,Frente,Minimo) Donde minimo es una ruta completa
 % Descripción: Comprueba si una ruta tiene una distacia menor que otra
 min([[Camino,Largo,Tiempo,TiempoPresa]|Resto],[_,Minimo,_,_],MinLista) :- Largo < Minimo, !, min(Resto,[Camino,Largo,Tiempo,TiempoPresa],MinLista). % ! significa encontro a uno menor, asi que no vale la pena seguir con ese largo
 % Descripción: Llamada recursiva para el resto de las rutas en caso de que no se cumpla resto = [] o Largo < Minimo
 min([_|Resto],Minimo,MinLista) :- min(Resto,Minimo,MinLista).
+
+% - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 % Condicion de parada
 % Descripción: busca la ruta mas corta entre A y B y corte
@@ -133,8 +156,8 @@ miRuta([A,B|Resto],Ruta,Largo,Tiempo,TiempoPresa):-
 % Condicion especial
 % Descripción: Da error si se intenta ir a lugar de origen si realizar ninguna parada
 wazeLogIn([A,A]):-
-    write("Ya se encuentra en su destino. \n"),
-    !,fail.
+    write("WazeLog: Ya se encuentra en su destino! \n"),
+    !.
 
 % wazeLogIn(Destinos) Destinos es una lista de lugares
 % Descripción: Imprime las preguntas necesarias para saber si que tiempo se requiere e imprime la ruta final al usuario. regla principal de wazeLogIn
@@ -151,9 +174,9 @@ wazeLogOut(Destinos,Bool):-
     miRuta(Destinos,Ruta,Largo,_,TiempoPresa),
     write("WazeLog: Su ruta es "),
     printList(Ruta),
-    write(" la distancia por recorrer es "),write(Largo),write(" kilometros"),
-    write(" y el tiempo estimado es "), write(TiempoPresa),write(" minutos. \n"),
-    write("Que tenga un buen viaje!"),!.
+    write("WazeLog: La distancia por recorrer es "),write(Largo),write(" kilometros;\n"),
+    write("WazeLog: Y el tiempo estimado es "), write(TiempoPresa),write(" minutos. \n"),
+    write("WazeLog: Que tenga un buen viaje! Y gracias por usar WazeLog! "),!.
 
 % Descripción: Imprime las rutas para cuando no hay presa
 wazeLogOut(Destinos,Bool):-
@@ -163,7 +186,7 @@ wazeLogOut(Destinos,Bool):-
     printList(Ruta),
     write("WazeLog: La distancia por recorrer es "),write(Largo),write(" kilometros;\n"),
     write("WazeLog: Y el tiempo estimado es "), write(Tiempo),write(" minutos. \n"),
-    write("WazeLog Que tenga un buen viaje! Y gracias por usar WazeLog! "),!.
+    write("WazeLog: Que tenga un buen viaje! Y gracias por usar WazeLog! "),!.
 
 % Descripción: Si no se comprende la respuesta a si es hora pico o no.
 wazeLogOut(Destinos,_):-
